@@ -1,0 +1,29 @@
+
+一个屌丝理由，为了找到对方撤回的图片，研究了微信mac客户端。
+只做关键信息记录。
+
+~/Library/Containers/com.tencent.xinWeChat/Data/Library
+这也是网上指引用的文件夹，有一些内容，对本次目的没有用处。
+
+突破口文件夹
+/private/var/folders/_g/???/T/com.tencent.xinWeChat/???
+有客户端和服务器的一些交互信息，每条信息都有。
+
+找到我需要的信息
+<?xml version="1.0"?>
+<msg>
+<img aeskey="?" encryver="1" cdnthumbaeskey="?" cdnthumburl="?" cdnthumblength="?" cdnthumbheight="?" cdnthumbwidth="?" cdnmidheight="0" cdnmidwidth="0" cdnhdheight="0" cdnhdwidth="0" cdnmidimgurl="?" length="?" md5="?" />
+</msg>
+
+抓包测试和筛选
+一个http请求 125.39.132.13 POST /download HTTP/1.1
+请求内容和返回结果 与 上边信息中 cdnmidimgurl 和 length 一样或接近。
+列举请求字段：seq,ver,weixinnum,zoneid,from,authkey,rangestart,rangeend,fileid,filetype
+fileid 即是 cdnmidimgurl
+通过构造参数，模拟请求，获取到密文信息，并通过解密成功获取到图片。
+
+收获
+更新成原目标相应的 rangestart,rangeend,fileid，更新http header，请求发出；
+去掉header头和信息头，获取图片密文，用aeskey解密后保存成文件，即可得到图片。
+
+
